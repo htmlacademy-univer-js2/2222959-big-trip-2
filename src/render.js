@@ -4,7 +4,7 @@ const RenderPosition = {
   BEFOREEND: 'beforeend',
   AFTEREND: 'afterend',
 };
-  
+
 // Принцип работы прост:
 // 1. создаём пустой div-блок
 // 2. берём HTML в виде строки и вкладываем в этот div-блок, превращая в DOM-элемент
@@ -12,7 +12,7 @@ const RenderPosition = {
 const createElement = (template) => {
   const newElement = document.createElement('div'); // 1
   newElement.innerHTML = template; // 2
-  
+
   return newElement.firstElementChild; // 3
 };
 // Единственный нюанс, что HTML в строке должен иметь общую обёртку,
@@ -21,7 +21,7 @@ const createElement = (template) => {
   
 const render = (component, container, place = RenderPosition.BEFOREEND) => {
   const element = component.getElement();
-  
+
   switch (place) {
     case RenderPosition.BEFOREBEGIN:
       container.before(element);
@@ -37,5 +37,5 @@ const render = (component, container, place = RenderPosition.BEFOREEND) => {
       break;
   }
 };
-  
+
 export {RenderPosition, createElement, render};
