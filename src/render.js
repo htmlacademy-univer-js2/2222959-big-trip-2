@@ -18,7 +18,7 @@ const createElement = (template) => {
 // Единственный нюанс, что HTML в строке должен иметь общую обёртку,
 // то есть быть чем-то вроде <nav><a>Link 1</a><a>Link 2</a></nav>,
 // а не просто <a>Link 1</a><a>Link 2</a>
-  
+
 const render = (component, container, place = RenderPosition.BEFOREEND) => {
   const element = component.getElement();
 
