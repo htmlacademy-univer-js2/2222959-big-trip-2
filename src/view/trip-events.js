@@ -10,8 +10,8 @@ export default class TripEventsView {
     this.element = null;
   }
 
-  getTemplate() {
-    return createTripEventsTemplate;
+  get template() {
+    return createTripEventsTemplate();
   }
 
   getElement() {

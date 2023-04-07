@@ -1,5 +1,5 @@
 import { createElement } from '../render.js';
-import { destinations, offersByType } from '../mock/route-point.js';
+import { destinations, offersByType } from '../mock/point.js';
 import {humanizePointDueDate, duration, getDate, getTime } from '../utils.js';
 
 const renderOffers = (allOffers, checkedOffers) => allOffers
@@ -51,23 +51,21 @@ const createRoutePointTemplate = (routePoint) => {
 };
 
 export default class RoutePointView {
-  constructor(routePoint) {
-    this.routePoint = routePoint;
+  constructor(event) {
+    this._element = null;
+    this._event = event;
   }
 
-  getTemplate () {
+  get template () {
     return createRoutePointTemplate(this.routePoint);
   }
 
-  getElement() {
-    if (!this.element){
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
+  get element() {
+    this._element = this._element || createElement(this.template);
+    return this._element;
   }
 
   removeElement() {
-    this.element = null;
+    this._element = null;
   }
 }

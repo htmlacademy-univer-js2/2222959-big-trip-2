@@ -1,9 +1,8 @@
 import { createElement } from '../render.js';
-import { destinations, offersByType } from '../mock/route-point.js';
+import { destinations, offersByType } from '../mock/point.js';
 import {getDateTime} from '../utils.js';
 
 const renderDestinationPictures = (pictures) => pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('');
-
 
 const renderOffers = (allOffers, checkedOffers) => {
   let result = '';
@@ -22,11 +21,11 @@ const renderOffers = (allOffers, checkedOffers) => {
   return result;
 };
 
-const createFormEditTemplate = (routePoint) => {
+const createEditingFormTemplate = (routePoint) => {
   const {basePrice, type, destination, dateFrom, dateTo, offers} = routePoint;
   const allPointTypeOffers = offersByType.find((offer) => offer.type === type);
   return (
-    `<li class="trip-events__item">
+    `
     <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
@@ -123,29 +122,26 @@ const createFormEditTemplate = (routePoint) => {
                     </div>
         </section>
       </section>
-    </form>
-  </li>`
+    </form>`
   );
 };
 
-export default class FormEditView {
-  constructor(routePoint) {
-    this.routePoint = routePoint;
+export default class EditingFormView {
+  constructor(event) {
+    this._element = null;
+    this._event = event;
   }
 
-  getTemplate () {
-    return createFormEditTemplate(this.routePoint);
+  get template () {
+    return createEditingFormTemplate(this._event);
   }
 
-  getElement() {
-    if (!this.element){
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
+  get element() {
+    this._element = this._element || createElement(this.template);
+    return this._element;
   }
 
   removeElement() {
-    this.element = null;
+    this._element = null;
   }
 }

@@ -144,20 +144,21 @@ const createFormCreateTemplate = () =>
 </li>`;
 
 export default class FormCreateView {
-  constructor() {
-    this.element = null;
+  constructor(point) {
+    this._element = null;
+    this._event = point;
   }
 
-  getTemplate() {
+  get template() {
     return createFormCreateTemplate();
   }
 
-  getElement() {
-    this.element = this.element || createElement(this.getTemplate());
-    return this.element;
+  get element() {
+    this._element = this._element || createElement(this.template);
+    return this._element;
   }
 
   removeElement() {
-    this.element = null;
+    this._element = null;
   }
 }

@@ -1,23 +1,61 @@
-import EventView from '../view/trip-events.js';
+import TripEventsView from '../view/trip-events.js';
 import RoutePointView from '../view/route-point.js';
-import FormEditView from '../view/form-edit';
-import SortView from '../view/sort.js';
+import FormEditView from '../view/form-edit.js';
 import { render } from '../render.js';
 
 export default class TripEventsPresenter {
-  constructor(tripContainer) {
-    this.eventsList = new EventView();
-    this.tripContainer = tripContainer;
+  constructor() {
+    this._rootContainer = null;
+    this._eventsModel = null;
+    this._events = null;
+    this._eventList = new TripEventsView();
   }
 
-  init(RoutePointsModel) {
-    this.RoutePointsModel = RoutePointsModel;
-    this.boardRoutePoints = [...this.routePointsModel.getRoutePoints()];
+  _renderEvent(event) {
+    const eventComponent = new RoutePointView(event);
+    const eventEditComponent = new FormEditView(event);
 
-    render(new SortView(), this.tripContainer);
-    render(this.eventsList, this.tripContainer);
-    render(new FormEditView(this.boardRoutePoints[0]), this.eventsList.getElement());
 
-    this.boardRoutePoints.forEach((routePoint) => render(new RoutePointView(routePoint), this.eventsList.getElement()));
+    const editToEvent = () => {
+      this._eventList.element.replaceChild(eventComponent.element, eventEditComponent.element);
+    };
+
+    const eventToEdit = () => {
+      this._eventList.element.replaceChild(eventEditComponent.element, eventComponent.element);
+    };
+
+    const onEscKeyDown = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        evt.preventDefault();
+        editToEvent();
+        document.removeEventListener('keydown', onEscKeyDown);
+      }
+    };
+
+    eventComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      eventToEdit();
+      document.addEventListener('keydown', onEscKeyDown);
+    });
+
+    eventEditComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      editToEvent();
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
+
+    eventEditComponent.element.querySelector('.event__save-btn').addEventListener('click', (evt) => {
+      evt.preventDefault();
+      editToEvent();
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
+
+    render(eventComponent, this._eventList.element);
+  }
+
+  init(tripContainer, pointsModel) {
+    this._rootContainer = tripContainer;
+    this._eventsModel = pointsModel;
+    this._events = [...this._eventsModel.events];
+    render(this._eventList, this._rootContainer);
+    this._events.forEach((event) => this._renderEvent(event));
   }
 }

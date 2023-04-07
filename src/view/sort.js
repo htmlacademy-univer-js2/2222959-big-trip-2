@@ -27,19 +27,19 @@ const createSortTemplate = () => (
 
 export default class SortView {
   constructor() {
-    this.element = null;
+    this._element = null;
   }
 
-  getTemplate() {
+  get template() {
     return createSortTemplate();
   }
 
-  getElement() {
-    this.element = this.element || createElement(this.getTemplate());
-    return this.element;
+  get element() {
+    this._element = this._element || createElement(this.template);
+    return this._element;
   }
 
   removeElement() {
-    this.element = null;
+    this._element = null;
   }
 }
