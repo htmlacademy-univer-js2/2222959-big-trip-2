@@ -43,7 +43,7 @@ const generateOffersByType = (pointType) => ({
 
 const offersByType = Array.from({length: POINT_TYPES.length}).map((value, index) => generateOffersByType(POINT_TYPES[index]));
 
-const generateRoutePoint = (id) => {
+const generatePoints = (id) => {
   const offersByTypePoint = getRandomElement(offersByType);
   const allOfferIdsByTypePoint = offersByTypePoint.offers.map((offer) => offer.id);
   return {
@@ -58,4 +58,4 @@ const generateRoutePoint = (id) => {
   };
 };
 
-export {generateRoutePoint, destinations, offersByType };
+export {generatePoints, destinations, offersByType };

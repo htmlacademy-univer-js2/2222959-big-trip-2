@@ -1,5 +1,5 @@
 import { createElement } from '../render.js';
-import { destinations, offersByType } from '../mock/route-point.js';
+import { destinations, offersByType } from '../mock/point.js';
 import {humanizePointDueDate, duration, getDate, getTime } from '../utils.js';
 
 const renderOffers = (allOffers, checkedOffers) => allOffers

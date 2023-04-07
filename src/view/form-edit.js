@@ -1,9 +1,8 @@
 import { createElement } from '../render.js';
-import { destinations, offersByType } from '../mock/route-point.js';
+import { destinations, offersByType } from '../mock/point.js';
 import {getDateTime} from '../utils.js';
 
 const renderDestinationPictures = (pictures) => pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('');
-
 
 const renderOffers = (allOffers, checkedOffers) => {
   let result = '';
@@ -22,7 +21,7 @@ const renderOffers = (allOffers, checkedOffers) => {
   return result;
 };
 
-const createFormEditTemplate = (routePoint) => {
+const createEditingFormTemplate = (routePoint) => {
   const {basePrice, type, destination, dateFrom, dateTo, offers} = routePoint;
   const allPointTypeOffers = offersByType.find((offer) => offer.type === type);
   return (
@@ -128,13 +127,13 @@ const createFormEditTemplate = (routePoint) => {
   );
 };
 
-export default class FormEditView {
+export default class EditingFormView {
   constructor(routePoint) {
     this.routePoint = routePoint;
   }
 
   getTemplate () {
-    return createFormEditTemplate(this.routePoint);
+    return createEditingFormTemplate(this.routePoint);
   }
 
   getElement() {
