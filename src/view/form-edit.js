@@ -25,7 +25,7 @@ const createEditingFormTemplate = (routePoint) => {
   const {basePrice, type, destination, dateFrom, dateTo, offers} = routePoint;
   const allPointTypeOffers = offersByType.find((offer) => offer.type === type);
   return (
-    `<li class="trip-events__item">
+    `
     <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
@@ -122,29 +122,26 @@ const createEditingFormTemplate = (routePoint) => {
                     </div>
         </section>
       </section>
-    </form>
-  </li>`
+    </form>`
   );
 };
 
 export default class EditingFormView {
-  constructor(routePoint) {
-    this.routePoint = routePoint;
+  constructor(event) {
+    this._element = null;
+    this._event = event;
   }
 
-  getTemplate () {
-    return createEditingFormTemplate(this.routePoint);
+  get template () {
+    return createEditingFormTemplate(this._event);
   }
 
-  getElement() {
-    if (!this.element){
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
+  get element() {
+    this._element = this._element || createElement(this.template);
+    return this._element;
   }
 
   removeElement() {
-    this.element = null;
+    this._element = null;
   }
 }
