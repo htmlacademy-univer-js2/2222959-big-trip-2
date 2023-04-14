@@ -1,7 +1,9 @@
 import TripEventsView from '../view/trip-events.js';
 import RoutePointView from '../view/route-point.js';
 import FormEditView from '../view/form-edit.js';
-import { render } from '../render.js';
+import SortView from '../view/sort.js';
+import EmptyEventsView from '../view/empty-events-view.js';
+import { render, RenderPosition } from '../render.js';
 
 export default class TripEventsPresenter {
   constructor() {
@@ -57,5 +59,11 @@ export default class TripEventsPresenter {
     this._events = [...this._eventsModel.events];
     render(this._eventList, this._rootContainer);
     this._events.forEach((event) => this._renderEvent(event));
+    if (this._events.length) {
+      render(new SortView(), this._rootContainer, RenderPosition.AFTERBEGIN);
+      this._events.forEach((event) => this._renderEvent(event));
+    } else {
+      render(new EmptyEventsView(), this._rootContainer);
+    }
   }
 }
