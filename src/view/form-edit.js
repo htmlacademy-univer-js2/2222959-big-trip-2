@@ -1,6 +1,6 @@
-import { createElement } from '../render.js';
-import { destinations, offersByType } from '../mock/point.js';
-import {getDateTime} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view';
+import { destinations, offersByType } from '../mock/point';
+import { getDateTime } from '../utils';
 
 const renderDestinationPictures = (pictures) => pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('');
 
@@ -126,22 +126,35 @@ const createEditingFormTemplate = (routePoint) => {
   );
 };
 
-export default class EditingFormView {
+export default class EditingFormView extends AbstractView {
+  #event;
+
   constructor(event) {
-    this._element = null;
-    this._event = event;
+    super();
+    this.#event = event;
   }
 
   get template () {
-    return createEditingFormTemplate(this._event);
+    return createEditingFormTemplate(this.#event);
   }
 
-  get element() {
-    this._element = this._element || createElement(this.template);
-    return this._element;
+  setRollDownHandler = (callback) => {
+    this._callback.rollDown = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollDownHandler);
   }
 
-  removeElement() {
-    this._element = null;
+  #rollDownHandler = (e) => {
+    e.preventDefault();
+    this._callback.rollDown();
+  }
+
+  setSaveHandler = (callback) => {
+    this._callback.save = callback;
+    this.element.querySelector('.event__save-btn').addEventListener('click', this.#saveHandler);
+  }
+
+  #saveHandler = (e) => {
+    e.preventDefault();
+    this._callback.save();
   }
 }
