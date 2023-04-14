@@ -3,7 +3,6 @@ import TripEventsPresenter from './presenter/trip-events-presenter.js';
 import MenuView from './view/menu.js';
 import PointsModel from './model/point-model.js';
 import FormCreateView from './view/form-create.js';
-import SortView from './view/sort.js';
 import TripInfoView from './view/trip-info-view.js';
 import { render, RenderPosition } from './render.js';
 
@@ -22,5 +21,4 @@ const eventsModel = new PointsModel();
 render(new MenuView(), navigation);
 render(new TripInfoView(), tripMainElement, RenderPosition.AFTERBEGIN);
 render(new FilterView(), filters);
-render(new SortView(), content);
 routePresenter.init(content, eventsModel);
