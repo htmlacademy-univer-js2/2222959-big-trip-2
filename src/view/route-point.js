@@ -1,6 +1,6 @@
-import { createElement } from '../render.js';
-import { destinations, offersByType } from '../mock/point.js';
-import {humanizePointDueDate, duration, getDate, getTime } from '../utils.js';
+import AbstractView from '../framework/view/abstract-view';
+import { destinations, offersByType } from '../mock/point';
+import { humanizePointDueDate, duration, getDate, getTime } from '../utils';
 
 const renderOffers = (allOffers, checkedOffers) => allOffers
   .filter((offer) => checkedOffers.includes(offer.id))
@@ -50,22 +50,25 @@ const createRoutePointTemplate = (routePoint) => {
   );
 };
 
-export default class RoutePointView {
+export default class RoutePointView extends AbstractView {
+  #event;
+
   constructor(event) {
-    this._element = null;
-    this._event = event;
+    super();
+    this.#event = event;
   }
 
-  get template () {
-    return createRoutePointTemplate(this.routePoint);
+  get template() {
+    return createRoutePointTemplate(this.#event);
   }
 
-  get element() {
-    this._element = this._element || createElement(this.template);
-    return this._element;
+  setRollUpHandler = (callback) => {
+    this._callback.rollUp = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollUpHandler);
   }
 
-  removeElement() {
-    this._element = null;
+  #rollUpHandler = (e) => {
+    e.preventDefault();
+    this._callback.rollUp();
   }
 }

@@ -3,28 +3,20 @@ import RoutePointView from '../view/route-point.js';
 import FormEditView from '../view/form-edit.js';
 import SortView from '../view/sort.js';
 import EmptyEventsView from '../view/empty-events-view.js';
-import { render, RenderPosition } from '../render.js';
+import { render, RenderPosition, replace } from '../framework/render';
 
 export default class TripEventsPresenter {
-  constructor() {
-    this._rootContainer = null;
-    this._eventsModel = null;
-    this._events = null;
-    this._eventList = new TripEventsView();
-  }
+  #rootContainer = null;
+  #eventsModel = null;
+  #events = null;
+  #eventsList = new TripEventsView();
 
-  _renderEvent(event) {
+  #renderEvent = (event) => {
     const eventComponent = new RoutePointView(event);
     const eventEditComponent = new FormEditView(event);
 
-
-    const editToEvent = () => {
-      this._eventList.element.replaceChild(eventComponent.element, eventEditComponent.element);
-    };
-
-    const eventToEdit = () => {
-      this._eventList.element.replaceChild(eventEditComponent.element, eventComponent.element);
-    };
+    const editToEvent = () => replace(eventEditComponent, eventComponent);
+    const eventToEdit = () => replace(eventComponent, eventEditComponent);
 
     const onEscKeyDown = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
@@ -34,36 +26,35 @@ export default class TripEventsPresenter {
       }
     };
 
-    eventComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    eventComponent.setRollUpHandler(() => {
       eventToEdit();
       document.addEventListener('keydown', onEscKeyDown);
     });
 
-    eventEditComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    eventEditComponent.setRollDownHandler(() => {
       editToEvent();
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    eventEditComponent.element.querySelector('.event__save-btn').addEventListener('click', (evt) => {
-      evt.preventDefault();
+    eventEditComponent.setSaveHandler(() => {
       editToEvent();
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    render(eventComponent, this._eventList.element);
-  }
+    render(eventComponent, this.#eventsList.element);
+  };
 
-  init(tripContainer, pointsModel) {
-    this._rootContainer = tripContainer;
-    this._eventsModel = pointsModel;
-    this._events = [...this._eventsModel.events];
-    render(this._eventList, this._rootContainer);
-    this._events.forEach((event) => this._renderEvent(event));
-    if (this._events.length) {
-      render(new SortView(), this._rootContainer, RenderPosition.AFTERBEGIN);
-      this._events.forEach((event) => this._renderEvent(event));
+  init = (tripContainer, pointsModel) => {
+    this.#rootContainer = tripContainer;
+    this.#eventsModel = pointsModel;
+    this.#events = [...this.#eventsModel.events];
+    render(this.#eventsList, this.#rootContainer);
+    this.#events.forEach((event) => this.#renderEvent(event));
+    if (this.#events.length) {
+      render(new SortView(), this.#rootContainer, RenderPosition.AFTERBEGIN);
+      this.#events.forEach((event) => this.#renderEvent(event));
     } else {
-      render(new EmptyEventsView(), this._rootContainer);
+      render(new EmptyEventsView(), this.#rootContainer);
     }
   }
 }

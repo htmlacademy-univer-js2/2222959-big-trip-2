@@ -1,10 +1,10 @@
-import FilterView from './view/filter.js';
-import TripEventsPresenter from './presenter/trip-events-presenter.js';
-import MenuView from './view/menu.js';
-import PointsModel from './model/point-model.js';
-import FormCreateView from './view/form-create.js';
-import TripInfoView from './view/trip-info-view.js';
-import { render, RenderPosition } from './render.js';
+import FilterView from './view/filter';
+import TripEventsPresenter from './presenter/trip-events-presenter';
+import MenuView from './view/menu';
+import PointsModel from './model/point-model';
+import FormCreateView from './view/form-create';
+import TripInfoView from './view/trip-info-view';
+import { render, RenderPosition } from './framework/render';
 
 
 const headerElement = document.querySelector('.page-header');
