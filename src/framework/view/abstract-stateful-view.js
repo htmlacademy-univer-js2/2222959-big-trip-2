@@ -1,5 +1,5 @@
 import AbstractView from './abstract-view.js';
-import structuredClone from "@ungap/structured-clone";
+import structuredClone from '@ungap/structured-clone';
 
 /**
  * Абстрактный класс представления с состоянием

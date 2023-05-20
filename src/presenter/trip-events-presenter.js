@@ -56,5 +56,5 @@ export default class TripEventsPresenter {
     } else {
       render(new EmptyEventsView(), this.#rootContainer);
     }
-  }
+  };
 }
