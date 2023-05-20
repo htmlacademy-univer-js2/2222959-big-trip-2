@@ -1,5 +1,4 @@
 import AbstractView from './abstract-view.js';
-import structuredClone from '@ungap/structured-clone';
 
 /**
  * Абстрактный класс представления с состоянием
@@ -35,7 +34,7 @@ export default class AbstractStatefulView extends AbstractView {
    * @param {Object} update Объект с обновлённой частью состояния
    */
   _setState(update) {
-    this._state = structuredClone({...this._state, ...update});
+    this._state = {...this._state, ...update};
   }
 
   /** Метод для перерисовки элемента */

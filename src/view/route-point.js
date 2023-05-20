@@ -7,8 +7,7 @@ const renderOffers = (allOffers, checkedOffers) => allOffers
   .map((offer) => `<li class="event__offer"><span class="event__offer-title">${offer.title}</span>&plus;&euro;&nbsp;<span class="event__offer-price">${offer.price}</span></li>`)
   .join('');
 
-const createRoutePointTemplate = (routePoint) => {
-  const {basePrice, type, destination, isFavorite, dateFrom, dateTo, offers} = routePoint;
+const createRoutePointTemplate = ({basePrice, type, destination, isFavorite, dateFrom, dateTo, offers}) => {
   const allPointTypeOffers = offersByType.find(({type: offerType}) => offerType === type);
   const startDate = dateFrom ? humanizePointDueDate(dateFrom) : '';
   const endDate = dateTo ? humanizePointDueDate(dateTo) : '';

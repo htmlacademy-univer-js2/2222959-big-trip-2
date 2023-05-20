@@ -22,7 +22,7 @@ const eventsModel = new PointsModel();
 const routePresenter = new TripEventsPresenter(contentElement, eventsModel);
 const filters = generateFilter(eventsModel.events);
 
+routePresenter.init();
 render(new MenuView(), navigationElement);
 render(new TripInfoView(), tripMainElement, RenderPosition.AFTERBEGIN);
 render(new FilterView(filters), filtersElement);
-routePresenter.init();

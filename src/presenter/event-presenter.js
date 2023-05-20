@@ -2,7 +2,7 @@ import { render, replace, remove } from '../framework/render.js';
 import TripEventsView from '../view/trip-events.js';
 import EditingFormView from '../view/form-edit';
 
-const Type = {
+const TYPE = {
   DEFAULT: 'default',
   EDIT: 'edit'
 };
@@ -14,7 +14,7 @@ export default class EventPresenter {
   #component;
   #editComponent;
   #event;
-  #type = Type.DEFAULT;
+  #type = TYPE.DEFAULT;
 
   constructor(pointList, changeData, switchType) {
     this.#eventsList = pointList;
@@ -31,7 +31,7 @@ export default class EventPresenter {
     this.#component.setFavoriteHandler(this.#handleFavoriteClick);
     this.#editComponent = new EditingFormView(event);
     this.#editComponent.setRollDownHandler(this.#handleEventClick);
-    this.#editComponent.setSaveHandler(this.#handleEventClick);
+    this.#editComponent.setSaveHandler(this.#saveHandler);
 
 
     if (!previousEvent || !previousEventEdit) {
@@ -39,11 +39,11 @@ export default class EventPresenter {
       return;
     }
 
-    if (this.#type === Type.DEFAULT) {
+    if (this.#type === TYPE.DEFAULT) {
       replace(this.#component, previousEvent);
     }
 
-    if (this.#type === Type.EDIT) {
+    if (this.#type === TYPE.EDIT) {
       replace(this.#editComponent, previousEventEdit);
     }
 
@@ -57,7 +57,7 @@ export default class EventPresenter {
   };
 
   updateView = () => {
-    if (this.#type !== Type.DEFAULT) {
+    if (this.#type !== TYPE.DEFAULT) {
       this.#editToEvent();
     }
   };
@@ -66,23 +66,32 @@ export default class EventPresenter {
     replace(this.#editComponent, this.#component);
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#switchType();
-    this.#type = Type.EDITING;
+    this.#type = TYPE.EDITING;
   };
 
   #editToEvent = () => {
     replace(this.#editComponent, this.#component);
     document.addEventListener('keydown', this.#escKeyDownHandler);
-    this.#type = Type.DEFAULT;
+    this.#type = TYPE.DEFAULT;
   };
 
   #escKeyDownHandler = (event) => {
     if (event.key === 'Escape' || event.key === 'Esc') {
       event.preventDefault();
+      this.#editComponent.reset(this.#event);
       this.#editToEvent();
     }
   };
 
   #handleFavoriteClick = () => this.#changeData({...this.#event, isFavorite: !this.#event.isFavorite});
   #handleEditClick = () => this.#eventToEdit();
-  #handleEventClick = () => this.#editToEvent();
+  #handleEventClick = () => {
+    this.#editComponent.reset(this.#event);
+    this.#editToEvent();
+  };
+
+  #saveHandler = (event) => {
+    this.#changeData({ ...event });
+    this.#editToEvent();
+  };
 }
