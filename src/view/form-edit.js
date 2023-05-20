@@ -1,6 +1,11 @@
 import AbstractView from '../framework/view/abstract-view';
-import { destinations, offersByType } from '../mock/point';
-import { getDateTime } from '../utils';
+import { DESTINATION_NAMES, destinations, offersByType } from '../mock/point';
+import { getDateTime, capitalizeFirstSym } from '../utils';
+
+
+const createDestionationsOptionsTemplate = (destins) =>
+  destins.reduce((result, destin) =>
+    result.concat(`<option value="${destin}"></option>\n`), '');
 
 const renderDestinationPictures = (pictures) => pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('');
 
@@ -78,13 +83,11 @@ const createEditingFormTemplate = (routePoint) => {
         </div>
         <div class="event__field-group  event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
-          ${type}
+          ${capitalizeFirstSym(type)}
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destinations[destination].name}" list="destination-list-1">
           <datalist id="destination-list-1">
-            <option value="Amsterdam"></option>
-            <option value="Geneva"></option>
-            <option value="Chamonix"></option>
+            ${createDestionationsOptionsTemplate(DESTINATION_NAMES)}
           </datalist>
         </div>
         <div class="event__field-group  event__field-group--time">

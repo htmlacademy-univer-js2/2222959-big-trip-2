@@ -32,6 +32,17 @@ const getRandomInteger = (a = 0, b = 1) => Math.floor(Math.random() * (Math.floo
 
 const getRandomElement = (elements) => elements[getRandomInteger(0, elements.length - 1)];
 
+const checkDatesRelativeToCurrent = (dateFrom, dateTo) => dateFrom.isBefore(dayjs()) && dateTo.isAfter(dayjs());
+const isEventPlanned = (dateFrom, dateTo) => dateFrom.isAfter(dayjs()) || checkDatesRelativeToCurrent(dateFrom, dateTo);
+const isEventPassed = (dateFrom, dateTo) => dateTo.isBefore(dayjs()) || checkDatesRelativeToCurrent(dateFrom, dateTo);
+const capitalizeFirstSym = (str) => str[0].toUpperCase() + str.slice(1);
+
+const filter = {
+  'everything': (events) => events.map((event) => event),
+  'future': (events) => events.filter((event) => isEventPlanned(event.startDate, event.endDate)),
+  'past': (events) => events.filter((event) => isEventPassed(event.startDate, event.endDate))
+};
+
 export {
   getRandomInteger,
   getRandomElement,
@@ -39,5 +50,7 @@ export {
   duration,
   getDate,
   getDateTime,
-  getTime
+  getTime,
+  capitalizeFirstSym,
+  filter
 };
