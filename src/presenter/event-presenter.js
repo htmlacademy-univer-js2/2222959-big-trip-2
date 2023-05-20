@@ -49,18 +49,18 @@ export default class EventPresenter {
 
     remove(previousEvent);
     remove(previousEventEdit);
-  }
+  };
 
   destroy = () => {
     remove(this.#component);
     remove(this.#editComponent);
-  }
+  };
 
   updateView = () => {
     if (this.#type !== TYPE.DEFAULT) {
       this.#editToEvent();
     }
-  }
+  };
 
   #eventToEdit = () => {
     replace(this.#editComponent, this.#component);
@@ -73,7 +73,7 @@ export default class EventPresenter {
     replace(this.#editComponent, this.#component);
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#type = TYPE.DEFAULT;
-  }
+  };
 
   #escKeyDownHandler = (event) => {
     if (event.key === 'Escape' || event.key === 'Esc') {
@@ -81,7 +81,7 @@ export default class EventPresenter {
       this.#editComponent.reset(this.#event);
       this.#editToEvent();
     }
-  }
+  };
 
   #handleFavoriteClick = () => this.#changeData({...this.#event, isFavorite: !this.#event.isFavorite});
   #handleEditClick = () => this.#eventToEdit();
@@ -93,5 +93,5 @@ export default class EventPresenter {
   #saveHandler = (event) => {
     this.#changeData({ ...event });
     this.#editToEvent();
-  }
+  };
 }
