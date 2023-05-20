@@ -144,20 +144,20 @@ export default class EditingFormView extends AbstractView {
   setRollDownHandler = (callback) => {
     this._callback.rollDown = callback;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollDownHandler);
-  }
+  };
 
   #rollDownHandler = (e) => {
     e.preventDefault();
     this._callback.rollDown(this.#event);
-  }
+  };
 
   setSaveHandler = (callback) => {
     this._callback.save = callback;
     this.element.querySelector('.event__save-btn').addEventListener('click', this.#saveHandler);
-  }
+  };
 
   #saveHandler = (e) => {
     e.preventDefault();
     this._callback.save(this.#event);
-  }
+  };
 }

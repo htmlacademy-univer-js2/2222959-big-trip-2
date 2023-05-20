@@ -23,7 +23,7 @@ export default class TripEventsPresenter {
   init = () => {
     this.#events = [...this.#eventsModel.events];
     this.#renderEventsList();
-  }
+  };
 
   #renderEventsList = () => {
     if (this.#events.length) {
@@ -33,11 +33,11 @@ export default class TripEventsPresenter {
     } else {
       this.#renderEmptyList();
     }
-  }
+  };
 
   #renderEvents = () => {
     this.#events.array.forEach((event) => this.#renderEvent(event));
-  }
+  };
 
   #renderEvent = (event) => {
     const evtPresenter = new EventPresenter(
@@ -47,12 +47,12 @@ export default class TripEventsPresenter {
     );
     evtPresenter.init(event);
     this.#eventPresenter.set(event.id, evtPresenter);
-  }
+  };
 
   #changePointHandler = (updateEvt) => {
     this.#events = update(this.#events, updateEvt);
     this.#eventPresenter.get(updateEvt.id).init(updateEvt);
-  }
+  };
 
   #switchModeHandler = () => {
     this.#eventPresenter.forEach((presenter) => presenter.resetView());

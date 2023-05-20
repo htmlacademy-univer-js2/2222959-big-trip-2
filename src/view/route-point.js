@@ -65,12 +65,12 @@ export default class RoutePointView extends AbstractView {
   setRollUpHandler = (callback) => {
     this._callback.rollUp = callback;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollUpHandler);
-  }
+  };
 
   #rollUpHandler = (e) => {
     e.preventDefault();
     this._callback.rollUp();
-  }
+  };
 
   setRollUpHandler = (callback) => {
     this._callback.favoriteClick = callback;
@@ -78,11 +78,11 @@ export default class RoutePointView extends AbstractView {
       'click',
       this.#favoriteClickHandler
     );
-  }
+  };
 
   #favoriteClickHandler = (event) => {
     event.preventDefault();
     this._callback.favoriteClick();
-  }
+  };
 
 }
