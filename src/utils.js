@@ -43,6 +43,14 @@ const filter = {
   'past': (events) => events.filter((event) => isEventPassed(event.startDate, event.endDate))
 };
 
+const update = (items, updatedItem) =>
+  items.map((item) => {
+    if (item.id === updatedItem.id) {
+      return updatedItem;
+    }
+    return item;
+  });
+
 export {
   getRandomInteger,
   getRandomElement,
@@ -52,5 +60,6 @@ export {
   getDateTime,
   getTime,
   capitalizeFirstSym,
-  filter
+  filter,
+  update
 };

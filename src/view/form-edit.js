@@ -148,7 +148,7 @@ export default class EditingFormView extends AbstractView {
 
   #rollDownHandler = (e) => {
     e.preventDefault();
-    this._callback.rollDown();
+    this._callback.rollDown(this.#event);
   };
 
   setSaveHandler = (callback) => {
@@ -158,6 +158,6 @@ export default class EditingFormView extends AbstractView {
 
   #saveHandler = (e) => {
     e.preventDefault();
-    this._callback.save();
+    this._callback.save(this.#event);
   };
 }

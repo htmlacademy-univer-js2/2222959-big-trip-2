@@ -71,4 +71,18 @@ export default class RoutePointView extends AbstractView {
     e.preventDefault();
     this._callback.rollUp();
   };
+
+  setFavoriteHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.element.querySelector('.event__favorite-btn').addEventListener(
+      'click',
+      this.#favoriteClickHandler
+    );
+  };
+
+  #favoriteClickHandler = (event) => {
+    event.preventDefault();
+    this._callback.favoriteClick();
+  };
+
 }
