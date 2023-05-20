@@ -51,6 +51,20 @@ const update = (items, updatedItem) =>
     return item;
   });
 
+const sortByPrice = (a, b) => b.basePrice - a.basePrice;
+const sortByDuration = (a, b) => {
+  const durationA = Math.ceil(a.endDate.diff(a.startDate, 'minute', true));
+  const durationB = Math.ceil(b.endDate.diff(b.startDate, 'minute', true));
+  return durationB - durationA;
+};
+const sortByDate = (a, b) => dayjs(a.startDate) - dayjs(b.startDate);
+
+const SORT_TYPES = {
+  DEFAULT: 'day',
+  TIME: 'time',
+  PRICE: 'price'
+};
+
 export {
   getRandomInteger,
   getRandomElement,
@@ -61,5 +75,9 @@ export {
   getTime,
   capitalizeFirstSym,
   filter,
-  update
+  update,
+  sortByPrice,
+  sortByDuration,
+  sortByDate,
+  SORT_TYPES
 };
