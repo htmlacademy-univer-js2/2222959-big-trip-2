@@ -1,11 +1,10 @@
 import AbstractView from '../framework/view/abstract-view';
-import { capitalizeFirstSym } from '../utils';
 
 const generateFiltersEvents = ({ name }, isChecked) =>
   `<div class="trip-filters__filter">
     <input id="filter-${name}" class="trip-filters__filter-input  visually-hidden"
       type="radio" name="trip-filter" value="${name}" {${isChecked ? 'checked' : ''}>
-    <label class="trip-filters__filter-label" for="filter-${name}">${capitalizeFirstSym(name)}</label>
+    <label class="trip-filters__filter-label" for="filter-${name}">${name}</label>
   </div>`;
 
 const createFilterTemplate = (items) => {

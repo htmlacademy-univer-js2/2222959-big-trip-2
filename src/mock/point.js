@@ -33,7 +33,7 @@ const generateDestination = (id) => ({
 const destinations = DESTINATION_NAMES.map((_, index) => generateDestination(index));
 const generateOffer = (id, pointType) => ({
   id,
-  title: `offer for ${pointType}`,
+  title: pointType,
   price: getRandomInteger(Price.MIN, Price.MAX)
 });
 

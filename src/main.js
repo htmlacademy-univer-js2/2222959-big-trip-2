@@ -7,7 +7,6 @@ import TripInfoView from './view/trip-info-view';
 import { render, RenderPosition } from './framework/render';
 import { generateFilter } from './mock/point';
 
-
 const headerElement = document.querySelector('.page-header');
 const mainElement = document.querySelector('.page-main');
 

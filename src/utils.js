@@ -9,7 +9,7 @@ const TIME_FORMAT = 'hh:mm';
 const humanizePointDueDate = (date) => dayjs(date).format('DD MMM');
 
 const duration = (dateFrom, dateTo) => {
-  const difference = dayjs(dateTo).diff(dayjs(dateFrom), 'minute');
+  const difference = dayjs(dateTo).diff(dayjs(dateFrom), 'minute', true);
 
   const days = Math.floor(difference / TOTAL_DAY_MINUTES_COUNT);
   const restHours = Math.floor((difference % TOTAL_DAY_MINUTES_COUNT) / HOUR_MINUTES_COUNT);
@@ -35,20 +35,22 @@ const getRandomElement = (elements) => elements[getRandomInteger(0, elements.len
 const checkDatesRelativeToCurrent = (dateFrom, dateTo) => dateFrom.isBefore(dayjs()) && dateTo.isAfter(dayjs());
 const isEventPlanned = (dateFrom, dateTo) => dateFrom.isAfter(dayjs()) || checkDatesRelativeToCurrent(dateFrom, dateTo);
 const isEventPassed = (dateFrom, dateTo) => dateTo.isBefore(dayjs()) || checkDatesRelativeToCurrent(dateFrom, dateTo);
+const checkFavoriteOption = (isFavorite) => (isFavorite) ? 'event__favorite-btn--active' : '';
+const isSubmitDisabledByDate = (dateTo, dateFrom) => dayjs(dateTo).diff(dayjs(dateFrom)) <= 0;
 const capitalizeFirstSym = (str) => str[0].toUpperCase() + str.slice(1);
 
 const filter = {
   'everything': (events) => events.map((event) => event),
-  'future': (events) => events.filter((event) => isEventPlanned(event.startDate, event.endDate)),
-  'past': (events) => events.filter((event) => isEventPassed(event.startDate, event.endDate))
+  'future': (events) => events.filter((event) => isEventPlanned(event.dateFrom, event.dateTo)),
+  'past': (events) => events.filter((event) => isEventPassed(event.dateFrom, event.dateTo))
 };
 
 const update = (items, updatedItem) => items.map((item) => item.id === updatedItem.id ? updatedItem : item);
 
 const sortByPrice = (a, b) => b.basePrice - a.basePrice;
 const sortByDuration = (a, b) => {
-  const durationA = Math.ceil(a.endDate.diff(a.startDate, 'minute', true));
-  const durationB = Math.ceil(b.endDate.diff(b.startDate, 'minute', true));
+  const durationA = Math.ceil(dayjs(a.endDate).diff(dayjs(a.startDate, 'minute', true)));
+  const durationB = Math.ceil(dayjs(b.endDate).diff(dayjs(b.startDate, 'minute', true)));
   return durationB - durationA;
 };
 const sortByDate = (a, b) => dayjs(a.startDate) - dayjs(b.startDate);
@@ -72,6 +74,8 @@ export {
   update,
   sortByPrice,
   sortByDuration,
+  checkFavoriteOption,
+  isSubmitDisabledByDate,
   sortByDate,
   SORT_TYPES
 };

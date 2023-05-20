@@ -1,5 +1,5 @@
 import { render, replace, remove } from '../framework/render.js';
-import TripEventsView from '../view/trip-events.js';
+import RoutePointView from '../view/route-point.js';
 import EditingFormView from '../view/form-edit';
 
 const TYPE = {
@@ -26,7 +26,7 @@ export default class EventPresenter {
     this.#event = event;
     const previousEvent = this.#component;
     const previousEventEdit = this.#editComponent;
-    this.#component = new TripEventsView(event);
+    this.#component = new RoutePointView(event);
     this.#component.setRollUpHandler(this.#handleEditClick);
     this.#component.setFavoriteHandler(this.#handleFavoriteClick);
     this.#editComponent = new EditingFormView(event);
@@ -70,7 +70,7 @@ export default class EventPresenter {
   };
 
   #editToEvent = () => {
-    replace(this.#editComponent, this.#component);
+    replace(this.#component, this.#editComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#type = TYPE.DEFAULT;
   };
