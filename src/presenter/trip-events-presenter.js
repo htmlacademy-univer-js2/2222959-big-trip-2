@@ -2,15 +2,15 @@ import TripEventsView from '../view/trip-events.js';
 import SortView from '../view/sort.js';
 import EmptyEventsView from '../view/empty-events-view.js';
 import EventPresenter from './event-presenter.js';
-import { render } from '../framework/render.js';
+import { render, remove } from '../framework/render.js';
 import { SORT_TYPES, sortByPrice, sortByDuration, sortByDate, update } from '../utils.js';
 
 export default class TripEventsPresenter {
-  #rootContainer = null;
-  #eventsModel = null;
-  #events = null;
+  #rootContainer;
+  #eventsModel;
+  #events;
   #eventsList = new TripEventsView();
-  #sortComponent = new SortView();
+  #sortComponent;
   #emptyList = new EmptyEventsView();
   #eventPresenter = new Map();
   #currentSortType = SORT_TYPES.DEFAULT;
@@ -38,12 +38,12 @@ export default class TripEventsPresenter {
   };
 
   #renderEvents = () => {
-    this.#events.array.forEach((event) => this.#renderEvent(event));
+    this.#events.forEach((event) => this.#renderEvent(event));
   };
 
   #renderEvent = (event) => {
     const evtPresenter = new EventPresenter(
-      this.#emptyList.element,
+      this.#eventsList.element,
       this.#changePointHandler,
       this.#switchModeHandler
     );
@@ -87,10 +87,14 @@ export default class TripEventsPresenter {
   };
 
   #switchModeHandler = () => {
-    this.#eventPresenter.forEach((presenter) => presenter.resetView());
+    this.#eventPresenter.forEach((presenter) => presenter.updateView());
   };
 
   #renderSort = () => {
+    if (this.#sortComponent instanceof SortView) {
+      remove(this.#sortComponent);
+    }
+    this.#sortComponent = new SortView(this.#currentSortType);
     render(this.#sortComponent, this.#rootContainer);
     this.#sortComponent.setSortHandler(this.#sortHandler);
   };
