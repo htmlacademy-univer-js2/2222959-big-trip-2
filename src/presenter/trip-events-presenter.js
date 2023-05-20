@@ -2,9 +2,8 @@ import TripEventsView from '../view/trip-events.js';
 import SortView from '../view/sort.js';
 import EmptyEventsView from '../view/empty-events-view.js';
 import EventPresenter from './event-presenter.js';
-import { render } from '../framework/render';
-import { update } from '../utils';
-
+import { render } from '../framework/render.js';
+import { SORT_TYPES, sortByPrice, sortByDuration, sortByDate, update } from '../utils.js';
 
 export default class TripEventsPresenter {
   #rootContainer = null;
@@ -14,6 +13,8 @@ export default class TripEventsPresenter {
   #sortComponent = new SortView();
   #emptyList = new EmptyEventsView();
   #eventPresenter = new Map();
+  #currentSortType = SORT_TYPES.DEFAULT;
+  #initialEvents = [];
 
   constructor(rootContainer, eventsModel) {
     this.#rootContainer = rootContainer;
@@ -21,7 +22,8 @@ export default class TripEventsPresenter {
   }
 
   init = () => {
-    this.#events = [...this.#eventsModel.events];
+    this.#initialEvents = [...this.#eventsModel.events];
+    this.#events = [...this.#eventsModel.events].sort(sortByDate);
     this.#renderEventsList();
   };
 
@@ -49,15 +51,49 @@ export default class TripEventsPresenter {
     this.#eventPresenter.set(event.id, evtPresenter);
   };
 
+  #clearEventstList = () => {
+    this.#eventPresenter.forEach((presenter) => presenter.destroy());
+    this.#eventPresenter.clear();
+  };
+
   #changePointHandler = (updateEvt) => {
     this.#events = update(this.#events, updateEvt);
+    this.#initialEvents = update(this.#initialEvents, updateEvt);
     this.#eventPresenter.get(updateEvt.id).init(updateEvt);
+  };
+
+  #sort = (sortType) => {
+    switch (sortType) {
+      case SORT_TYPES.PRICE:
+        this.#events.sort(sortByPrice);
+        break;
+      case SORT_TYPES.TIME:
+        this.#events.sort(sortByDuration);
+        break;
+      default:
+        this.#events.sort(sortByDate);
+    }
+
+    this.#currentSortType = sortType;
+  };
+
+  #sortHandler = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+    this.#sort(sortType);
+    this.#clearEventstList();
+    this.#renderEventsList();
   };
 
   #switchModeHandler = () => {
     this.#eventPresenter.forEach((presenter) => presenter.resetView());
   };
 
-  #renderSort = () => render(this.#sortComponent, this.#rootContainer);
+  #renderSort = () => {
+    render(this.#sortComponent, this.#rootContainer);
+    this.#sortComponent.setSortHandler(this.#sortHandler);
+  };
+
   #renderEmptyList = () => render(this.#emptyList, this.#rootContainer);
 }
