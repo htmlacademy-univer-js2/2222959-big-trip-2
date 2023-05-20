@@ -3,11 +3,13 @@ import { generatePoints } from '../mock/point.js';
 const ROUTE_POINTS_COUNT = 3;
 
 export default class PointsModel {
+  #events;
+
   constructor() {
-    this.routePoints = new Array(ROUTE_POINTS_COUNT).fill().map((value, index) => generatePoints(index + 1));
+    this.#events = Array.from({ length: ROUTE_POINTS_COUNT }, generatePoints);
   }
 
-  getPoints() {
-    return this.routePoints;
+  get events() {
+    return this.#events;
   }
 }

@@ -1,60 +1,63 @@
 import TripEventsView from '../view/trip-events.js';
-import RoutePointView from '../view/route-point.js';
-import FormEditView from '../view/form-edit.js';
 import SortView from '../view/sort.js';
 import EmptyEventsView from '../view/empty-events-view.js';
-import { render, RenderPosition, replace } from '../framework/render';
+import EventPresenter from './event-presenter.js';
+import { render } from '../framework/render';
+import { update } from '../utils';
+
 
 export default class TripEventsPresenter {
   #rootContainer = null;
   #eventsModel = null;
   #events = null;
   #eventsList = new TripEventsView();
+  #sortComponent = new SortView();
+  #emptyList = new EmptyEventsView();
+  #eventPresenter = new Map();
+
+  constructor(rootContainer, eventsModel) {
+    this.#rootContainer = rootContainer;
+    this.#eventsModel = eventsModel;
+  }
+
+  init = () => {
+    this.#events = [...this.#eventsModel.events];
+    this.#renderEventsList();
+  }
+
+  #renderEventsList = () => {
+    if (this.#events.length) {
+      this.#renderSort();
+      render(this.#eventsList, this.#rootContainer);
+      this.#renderEvents();
+    } else {
+      this.#renderEmptyList();
+    }
+  }
+
+  #renderEvents = () => {
+    this.#events.array.forEach((event) => this.#renderEvent(event));
+  }
 
   #renderEvent = (event) => {
-    const eventComponent = new RoutePointView(event);
-    const eventEditComponent = new FormEditView(event);
+    const evtPresenter = new EventPresenter(
+      this.#emptyList.element,
+      this.#changePointHandler,
+      this.#switchModeHandler
+    );
+    evtPresenter.init(event);
+    this.#eventPresenter.set(event.id, evtPresenter);
+  }
 
-    const editToEvent = () => replace(eventEditComponent, eventComponent);
-    const eventToEdit = () => replace(eventComponent, eventEditComponent);
+  #changePointHandler = (updateEvt) => {
+    this.#events = update(this.#events, updateEvt);
+    this.#eventPresenter.get(updateEvt.id).init(updateEvt);
+  }
 
-    const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        editToEvent();
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
-
-    eventComponent.setRollUpHandler(() => {
-      eventToEdit();
-      document.addEventListener('keydown', onEscKeyDown);
-    });
-
-    eventEditComponent.setRollDownHandler(() => {
-      editToEvent();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    eventEditComponent.setSaveHandler(() => {
-      editToEvent();
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    render(eventComponent, this.#eventsList.element);
+  #switchModeHandler = () => {
+    this.#eventPresenter.forEach((presenter) => presenter.resetView());
   };
 
-  init = (tripContainer, pointsModel) => {
-    this.#rootContainer = tripContainer;
-    this.#eventsModel = pointsModel;
-    this.#events = [...this.#eventsModel.events];
-    render(this.#eventsList, this.#rootContainer);
-    this.#events.forEach((event) => this.#renderEvent(event));
-    if (this.#events.length) {
-      render(new SortView(), this.#rootContainer, RenderPosition.AFTERBEGIN);
-      this.#events.forEach((event) => this.#renderEvent(event));
-    } else {
-      render(new EmptyEventsView(), this.#rootContainer);
-    }
-  };
+  #renderSort = () => render(this.#sortComponent, this.#rootContainer);
+  #renderEmptyList = () => render(this.#emptyList, this.#rootContainer);
 }
