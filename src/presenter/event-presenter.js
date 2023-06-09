@@ -1,6 +1,7 @@
 import { render, replace, remove } from '../framework/render.js';
 import RoutePointView from '../view/route-point.js';
 import EditingFormView from '../view/form-edit';
+import { USER_ACTIONS, UPDATE_TYPES, isDatesEqual } from '../utils.js';
 
 const TYPE = {
   DEFAULT: 'default',
@@ -32,7 +33,7 @@ export default class EventPresenter {
     this.#editComponent = new EditingFormView(event);
     this.#editComponent.setRollDownHandler(this.#handleEventClick);
     this.#editComponent.setSaveHandler(this.#saveHandler);
-
+    this.#editComponent.setDeleteHandler(this.#deleteHandler);
 
     if (!previousEvent || !previousEventEdit) {
       render(this.#component, this.#eventsList);
@@ -90,8 +91,22 @@ export default class EventPresenter {
     this.#editToEvent();
   };
 
-  #saveHandler = (event) => {
-    this.#changeData({ ...event });
+  #saveHandler = (update) => {
+    const isMinorUpdate = isDatesEqual(this.#event.startDate, update.startDate);
+    this.#changeData(
+      USER_ACTIONS.UPDATE,
+      isMinorUpdate ? UPDATE_TYPES.PATCH : UPDATE_TYPES.MINOR,
+      update,
+    );
     this.#editToEvent();
+  };
+
+  #deleteHandler = (event) => {
+    this.#changeData(
+      USER_ACTIONS.DELETE,
+      UPDATE_TYPES.MINOR,
+      event,
+    );
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 }
