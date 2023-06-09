@@ -45,8 +45,6 @@ const filter = {
   'past': (events) => events.filter((event) => isEventPassed(event.dateFrom, event.dateTo))
 };
 
-const update = (items, updatedItem) => items.map((item) => item.id === updatedItem.id ? updatedItem : item);
-
 const sortByPrice = (a, b) => b.basePrice - a.basePrice;
 const sortByDuration = (a, b) => {
   const durationA = Math.ceil(dayjs(a.endDate).diff(dayjs(a.startDate, 'minute', true)));
@@ -55,10 +53,42 @@ const sortByDuration = (a, b) => {
 };
 const sortByDate = (a, b) => dayjs(a.startDate) - dayjs(b.startDate);
 
+const isSubmitDisabledByPrice = (price) => Number(price) > 0 && Number.isInteger(Number(price));
+
+const isDatesEqual = (dateA, dateB) => dayjs(dateA).isSame(dateB, 'D');
+
 const SORT_TYPES = {
   DEFAULT: 'day',
   TIME: 'time',
   PRICE: 'price'
+};
+
+const USER_ACTIONS = {
+  UPDATE: 'UPDATE_POINT',
+  ADD: 'ADD_POINT',
+  DELETE: 'DELETE_POINT',
+};
+
+const UPDATE_TYPES = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const NEW_POINT = {
+  basePrice: 0,
+  dateFrom: dayjs(),
+  dateTo: dayjs(),
+  destination: 1,
+  isFavorite: false,
+  offers: [],
+  type: 'taxi',
+};
+
+const FILTER_TYPES = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past'
 };
 
 export {
@@ -71,11 +101,16 @@ export {
   getTime,
   capitalizeFirstSym,
   filter,
-  update,
   sortByPrice,
   sortByDuration,
   checkFavoriteOption,
   isSubmitDisabledByDate,
+  isSubmitDisabledByPrice,
+  isDatesEqual,
   sortByDate,
-  SORT_TYPES
+  SORT_TYPES,
+  FILTER_TYPES,
+  USER_ACTIONS,
+  UPDATE_TYPES,
+  NEW_POINT
 };
