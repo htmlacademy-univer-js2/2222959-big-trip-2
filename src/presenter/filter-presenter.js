@@ -12,8 +12,8 @@ export default class FilterPresenter {
     this.#filterContainer = filterContainer;
     this.#filterModel = filterModel;
     this.#eventsModel = eventsModel;
-    this.#eventsModel.addObserver(this.#ModelEventHandler);
-    this.#filterModel.addObserver(this.#ModelEventHandler);
+    this.#eventsModel.addObserver(this.#modelEventHandler);
+    this.#filterModel.addObserver(this.#modelEventHandler);
   }
 
   get filters() {
@@ -54,7 +54,7 @@ export default class FilterPresenter {
     remove(prevFilterComponent);
   };
 
-  #ModelEventHandler = () => {
+  #modelEventHandler = () => {
     this.init();
   };
 
