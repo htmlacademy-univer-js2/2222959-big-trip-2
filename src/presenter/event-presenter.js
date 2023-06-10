@@ -15,6 +15,8 @@ export default class EventPresenter {
   #component;
   #editComponent;
   #event;
+  #offers = null;
+  #destinations = null;
   #type = TYPE.DEFAULT;
 
   constructor(pointList, changeData, switchType) {
@@ -23,14 +25,16 @@ export default class EventPresenter {
     this.#switchType = switchType;
   }
 
-  init = (event) => {
+  init = (event, offers, destinations) => {
     this.#event = event;
+    this.#offers = offers;
+    this.#destinations = destinations;
     const previousEvent = this.#component;
     const previousEventEdit = this.#editComponent;
-    this.#component = new RoutePointView(event);
+    this.#component = new RoutePointView(this.#event, this.#offers, this.#destinations);
     this.#component.setRollUpHandler(this.#handleEditClick);
     this.#component.setFavoriteHandler(this.#handleFavoriteClick);
-    this.#editComponent = new EditingFormView(event);
+    this.#editComponent = new EditingFormView(this.#event, this.#offers, this.#destinations);
     this.#editComponent.setRollDownHandler(this.#handleEventClick);
     this.#editComponent.setSaveHandler(this.#saveHandler);
     this.#editComponent.setDeleteHandler(this.#deleteHandler);
@@ -57,6 +61,13 @@ export default class EventPresenter {
     remove(this.#editComponent);
   };
 
+  resetView = () => {
+    if (this.#type !== TYPE.DEFAULT) {
+      this.#editComponent.reset(this.#event, this.#offers, this.#destinations);
+      this.#editToEvent();
+    }
+  };
+
   updateView = () => {
     if (this.#type !== TYPE.DEFAULT) {
       this.#editToEvent();
@@ -72,7 +83,7 @@ export default class EventPresenter {
 
   #editToEvent = () => {
     replace(this.#component, this.#editComponent);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#type = TYPE.DEFAULT;
   };
 
@@ -87,7 +98,7 @@ export default class EventPresenter {
   #handleFavoriteClick = () => this.#changeData({...this.#event, isFavorite: !this.#event.isFavorite});
   #handleEditClick = () => this.#eventToEdit();
   #handleEventClick = () => {
-    this.#editComponent.reset(this.#event);
+    this.#editComponent.reset(this.#event, this.#offers, this.#destinations);
     this.#editToEvent();
   };
 

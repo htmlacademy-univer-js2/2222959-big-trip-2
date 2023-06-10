@@ -1,8 +1,9 @@
 import TripEventsView from '../view/trip-events.js';
 import SortView from '../view/sort.js';
 import EmptyEventsView from '../view/empty-events-view.js';
+import LoadScreenView from '../view/load-screen-view.js';
 import EventPresenter from './event-presenter.js';
-import { render, remove } from '../framework/render.js';
+import { render, remove, RenderPosition } from '../framework/render.js';
 import { SORT_TYPES, UPDATE_TYPES, USER_ACTIONS, FILTER_TYPES, sortByPrice, sortByDuration, sortByDate, filter } from '../utils.js';
 import NewEventPresenter from './new-event-presenter';
 
@@ -11,6 +12,8 @@ export default class TripEventsPresenter {
   #eventsModel;
   #filterModel;
   #sortComponent = null;
+  #loadingComponent = new LoadScreenView();
+  #isLoading = true;
   #eventsList = new TripEventsView();
   #emptyList = null;
   #eventPresenter = new Map();
@@ -25,6 +28,14 @@ export default class TripEventsPresenter {
     this.#newEventPresenter = new NewEventPresenter(this.#eventsList.element, this.#actionHandler);
     this.#eventsModel.addObserver(this.#modelEventHandler);
     this.#filterModel.addObserver(this.#modelEventHandler);
+  }
+
+  get offers() {
+    return this.#eventsModel.offers;
+  }
+
+  get destinations() {
+    return this.#eventsModel.destinations;
   }
 
   init = () => {
@@ -59,7 +70,7 @@ export default class TripEventsPresenter {
   #renderEvent = (event) => {
     const eventPresenter = new EventPresenter(this.#eventsList.element,
       this.#actionHandler, this.#switchModeHandler);
-    eventPresenter.init(event);
+    eventPresenter.init(event, this.offers, this.destinations);
     this.#eventPresenter.set(event.id, eventPresenter);
   };
 
@@ -92,6 +103,11 @@ export default class TripEventsPresenter {
         this.#clear({ resetSortType: true });
         this.#render();
         break;
+      case UPDATE_TYPES.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#render();
+        break;
       default:
         throw new Error(`Update Type ${updateType} is undefined.`);
     }
@@ -116,7 +132,7 @@ export default class TripEventsPresenter {
       remove(this.#sortComponent);
     }
     this.#sortComponent = new SortView(this.#currentSortType);
-    render(this.#sortComponent, this.#rootContainer);
+    render(this.#sortComponent, this.#rootContainer, RenderPosition.AFTERBEGIN);
     this.#sortComponent.setSortHandler(this.#sortHandler);
   };
 
@@ -126,13 +142,23 @@ export default class TripEventsPresenter {
   }
 
   #render = () => {
-    if (!this.events.length) {
+    const events = this.events;
+    render(this.#eventsList, this.#rootContainer);
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
+    if (!events.length) {
       this.#renderEmptyList();
       return;
     }
     this.#renderSort();
-    render(this.#eventsList, this.#rootContainer);
-    this.#renderEvents(this.events);
+    this.#renderEvents(events);
+  };
+
+  #renderLoading = () => {
+    render(this.#loadingComponent, this.#rootContainer);
   };
 
   #clear = ({ resetSortType = false } = {}) => {
@@ -142,6 +168,7 @@ export default class TripEventsPresenter {
 
     remove(this.#sortComponent);
     remove(this.#emptyList);
+    remove(this.#loadingComponent);
 
     if (this.#emptyList) {
       remove(this.#emptyList);

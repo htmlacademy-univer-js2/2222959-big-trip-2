@@ -1,13 +1,15 @@
-import TripEventsPresenter from './presenter/trip-events-presenter';
-import MenuView from './view/menu';
-import PointsModel from './model/point-model';
-import TripInfoView from './view/trip-info-view';
-import NewEventButtonView from './view/new-event-btn-view';
-import FilterPresenter from './presenter/filter-presenter';
-import FilterModel from './model/filter-model';
-import { render, RenderPosition } from './framework/render';
+import TripEventsPresenter from './presenter/trip-events-presenter.js';
+import MenuView from './view/menu.js';
+import PointsModel from './model/point-model.js';
+import TripInfoView from './view/trip-info-view.js';
+import NewEventButtonView from './view/new-event-btn-view.js';
+import FilterPresenter from './presenter/filter-presenter.js';
+import FilterModel from './model/filter-model.js';
+import EventsApiService from './events-api-service.js';
+import { render, RenderPosition } from './framework/render.js';
 
-
+const AUTHORIZATION = 'Basic by2t8unK3gCMhlK';
+const END_POINT = 'https://18.ecmascript.pages.academy/big-trip';
 const headerElement = document.querySelector('.page-header');
 const mainElement = document.querySelector('.page-main');
 
@@ -17,7 +19,7 @@ const filtersElement = headerElement.querySelector('.trip-controls__filters');
 const contentElement = mainElement.querySelector('.trip-events');
 
 const filterModel = new FilterModel();
-const eventsModel = new PointsModel();
+const eventsModel = new PointsModel(new EventsApiService(END_POINT, AUTHORIZATION));
 const routePresenter = new TripEventsPresenter(contentElement, eventsModel, filterModel);
 const filterPresenter = new FilterPresenter(filtersElement, filterModel, eventsModel);
 const newEventButtonComponent = new NewEventButtonView();
@@ -37,5 +39,10 @@ newEventButtonComponent.setClickHandler(openNewEventFormHandler);
 
 filterPresenter.init();
 routePresenter.init();
+eventsModel.init()
+  .finally(() => {
+    render(newEventButtonComponent, tripMainElement);
+    newEventButtonComponent.setClickHandler(openNewEventFormHandler);
+  });
 render(new MenuView(), navigationElement);
 render(new TripInfoView(), tripMainElement, RenderPosition.AFTERBEGIN);
