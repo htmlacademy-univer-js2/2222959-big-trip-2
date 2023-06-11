@@ -1,3 +1,4 @@
+
 import { remove, render, RenderPosition } from '../framework/render.js';
 import EditingFormView from '../view/form-edit.js';
 import { USER_ACTIONS, UPDATE_TYPES } from '../utils.js';

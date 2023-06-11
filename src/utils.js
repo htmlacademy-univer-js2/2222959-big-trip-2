@@ -100,8 +100,8 @@ const TIME_LIMIT = {
 };
 
 const addOffersPrices = (eventType, events, offers) => {
-  const allOffers = offers.find((item) => item.type === eventType).offers;
-  const selected = events.map((offer) => allOffers.find((item) => item.id === offer).price);
+  const allOffers = offers.find(({ type }) => type === eventType).offers;
+  const selected = events.map((offer) => allOffers.find(({ id }) => id === offer).price);
   return selected.reduce((sum, price) => sum + price, 0);
 };
 

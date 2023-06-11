@@ -38,7 +38,7 @@ const createListTemplate = (offers) =>
       </label>
     </div>`).join('\n');
 
-const createEditingFormTemplate = ({ id, destination, type, basePrice, dateFrom, dateTo, offers, isDisabled, isSaving, isDeleting }, allOffers, allDestinations) => {
+const createEditingFormTemplate = ({ id, selectedDestination, type, basePrice, dateFrom, dateTo, offers, isDisabled, isSaving, isDeleting }, allOffers, allDestinations) => {
   const allOffersForType = findOffersForType(type, allOffers);
   const deleting = isDeleting ? 'Deleting...' : 'Delete';
   return `<li class="trip-events__item">
@@ -61,7 +61,7 @@ const createEditingFormTemplate = ({ id, destination, type, basePrice, dateFrom,
             <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name ? he.encode(destination.name) : ''}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(selectedDestination.name)}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
             <datalist id="destination-list-1">
               ${createDestionationsOptionsTemplate(allDestinations)}
             </datalist>
@@ -80,7 +80,12 @@ const createEditingFormTemplate = ({ id, destination, type, basePrice, dateFrom,
             </label>
             <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}" ${isDisabled ? 'disabled' : ''}>
           </div>
-          <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabledByDate(dateFrom, dateTo) ? '' : 'disabled'} ${isSubmitDisabledByPrice(basePrice) ? '' : 'disabled'} ${isSubmitDisabledByDestinationName(destination.name, allDestinations) ? '' : 'disabled'}>${isSaving ? 'Saving...' : 'Save'}</button>
+          <button class="event__save-btn  btn  btn--blue" type="submit"
+            ${isSubmitDisabledByDate(dateFrom, dateTo) ? '' : 'disabled'}
+            ${isSubmitDisabledByPrice(basePrice) ? '' : 'disabled'}
+            ${isSubmitDisabledByDestinationName(selectedDestination.name, allDestinations) ? '' : 'disabled'}>
+              ${isSaving ? 'Saving...' : 'Save'}
+          </button>
           <button class="event__reset-btn" type="reset">${id ? deleting : 'Cancel'}</button>
           <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
@@ -93,12 +98,12 @@ const createEditingFormTemplate = ({ id, destination, type, basePrice, dateFrom,
               ${renderOffers(offers, allOffersForType)}
             </div>
           </section>
-          <section class="event__section  event__section--destination">
+          <section class="event__section  event__section--destination ${selectedDestination.description !== '' ? 'visually-hidden' : ''}">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-            <p class="event__destination-description">${destination.description}</p>
+            <p class="event__destination-description">${selectedDestination.description}</p>
             <div class="event__photos-container">
                         <div class="event__photos-tape">
-                        ${destination.pictures ? renderDestinationPictures(destination.pictures) : ''}
+                        ${selectedDestination.pictures ? renderDestinationPictures(selectedDestination.pictures) : ''}
                         </div>
                       </div>
           </section>
@@ -212,7 +217,7 @@ export default class EditingFormView extends AbstractStatefulView {
   #destinationToggleHandler = (e) => {
     e.preventDefault();
     this.updateElement({
-      selectedDestinationName: e.target.value,
+      selectedDestination: e.target.value,
     });
   };
 

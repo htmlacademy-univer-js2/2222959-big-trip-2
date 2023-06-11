@@ -3,27 +3,22 @@ import { addDestinationName, addOffersPrices } from '../utils.js';
 import dayjs from 'dayjs';
 
 const tripDestinationNames = (events) => {
-  const tripDestinationName = events.map((event) => event.destinationName);
-  const uniqueNames = Array.from(new Set(tripDestinationName));
-  switch (uniqueNames.length) {
+  const destinationNames = events.map((event) => event.destinationName);
+  switch (tripDestinationNames.length) {
     case 1:
-      return `${uniqueNames[0]}`;
+      return `${destinationNames[0]}`;
     case 2:
-      return `${uniqueNames[0]} &mdash; ${uniqueNames[1]}`;
+      return `${destinationNames[0]} &mdash; ${destinationNames[1]}`;
     case 3:
-      return `${uniqueNames[0]} &mdash; ${uniqueNames[1]} &mdash; ${uniqueNames[2]}`;
+      return `${destinationNames[0]} &mdash; ${destinationNames[1]} &mdash; ${destinationNames[2]}`;
     default:
-      return `${uniqueNames[0]} &mdash; ... &mdash;${uniqueNames[uniqueNames.length - 1]}`;
+      return `${destinationNames[0]} &mdash; ... &mdash;${destinationNames[destinationNames.length - 1]}`;
   }
-
 };
 
-const totalPrice = (events) => {
-  const totalBasePrice = events.reduce((total, event) => total + event.basePrice, 0);
-  const totalOffersPrice = events.reduce((total, event) => total + event.offerPrices, 0);
-
-  return totalBasePrice + totalOffersPrice;
-};
+const totalPrice = (events) =>
+  events.reduce((total, { basePrice, offerPrices }) =>
+    total + basePrice + offerPrices, 0);
 
 const tripDates = (events) => {
   const startTripDate = events[0].dataFrom;

@@ -1,6 +1,6 @@
 import { render, remove, RenderPosition } from '../framework/render.js';
-import TripInfoView from '../view/trip-info-view.js';
-import { sortByDate } from '../utils.js';
+import TripInfoView from '../view/trip-info-view';
+import { sortByDate } from '../utils';
 
 export default class TripInfoPresenter {
   #tripInfoContainer = null;

@@ -82,11 +82,6 @@ export default class EventsModel extends Observable {
       throw new Error('Can\'t delete unexisting point');
     }
 
-    this.#events = [
-      ...this.#events.slice(0, index),
-      ...this.#events.slice(index + 1),
-    ];
-
     this._notify(updateType);
     try {
       await this.#eventsApiService.deleteEvent(update);
