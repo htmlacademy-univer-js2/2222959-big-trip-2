@@ -1,7 +1,7 @@
 import { render, replace, remove } from '../framework/render.js';
 import RoutePointView from '../view/route-point.js';
 import EditingFormView from '../view/form-edit';
-import { USER_ACTIONS, UPDATE_TYPES, isDatesEqual } from '../utils.js';
+import { USER_ACTIONS, UPDATE_TYPES } from '../utils.js';
 
 const TYPE = {
   DEFAULT: 'default',
@@ -50,10 +50,34 @@ export default class EventPresenter {
 
     if (this.#type === TYPE.EDIT) {
       replace(this.#editComponent, previousEventEdit);
+      this.#type = TYPE.DEFAULT;
     }
 
     remove(previousEvent);
     remove(previousEventEdit);
+  };
+
+  setSaving = () => {
+    if (this.#type === TYPE.EDITING) {
+      this.#editComponent.updateElement({ isDisabled: true, isSaving: true, });
+    }
+  };
+
+  setDeleting = () => {
+    if (this.#type === TYPE.EDITING) {
+      this.#editComponent.updateElement({ isDisabled: true, isDeleting: true, });
+    }
+  };
+
+  setAborting = () => {
+    if (this.#type === TYPE.DEFAULT) {
+      this.#editComponent.shake();
+      return;
+    }
+    const resetFormState = () => {
+      this.#editComponent.updateElement({ isDisabled: false, isSaving: false, isDeleting: false });
+    };
+    this.#editComponent.shake(resetFormState);
   };
 
   destroy = () => {
@@ -90,26 +114,27 @@ export default class EventPresenter {
   #escKeyDownHandler = (event) => {
     if (event.key === 'Escape' || event.key === 'Esc') {
       event.preventDefault();
-      this.#editComponent.reset(this.#event);
+      this.#editComponent.reset(this.#event, this.#offers, this.#destinations);
       this.#editToEvent();
     }
   };
 
-  #handleFavoriteClick = () => this.#changeData({...this.#event, isFavorite: !this.#event.isFavorite});
+  #handleFavoriteClick = () => this.#changeData(
+    USER_ACTIONS.UPDATE,
+    UPDATE_TYPES.MINOR,
+    { ...this.#event, isFavorite: !this.#event.isFavorite }
+  );
+
   #handleEditClick = () => this.#eventToEdit();
   #handleEventClick = () => {
-    this.#editComponent.reset(this.#event, this.#offers, this.#destinations);
-    this.#editToEvent();
+    if (this.#type !== TYPE.DEFAULT) {
+      this.#editComponent.reset(this.#event, this.#offers, this.#destinations);
+      this.#editToEvent();
+    }
   };
 
   #saveHandler = (update) => {
-    const isMinorUpdate = isDatesEqual(this.#event.startDate, update.startDate);
-    this.#changeData(
-      USER_ACTIONS.UPDATE,
-      isMinorUpdate ? UPDATE_TYPES.PATCH : UPDATE_TYPES.MINOR,
-      update,
-    );
-    this.#editToEvent();
+    this.#changeData(USER_ACTIONS.UPDATE, UPDATE_TYPES.MINOR, update);
   };
 
   #deleteHandler = (event) => {
