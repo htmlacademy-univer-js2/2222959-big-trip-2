@@ -1,6 +1,6 @@
 import { render, replace, remove } from '../framework/render.js';
 import RoutePointView from '../view/route-point.js';
-import EditingFormView from '../view/form-edit';
+import EditingFormView from '../view/edit-form.js';
 import { USER_ACTIONS, UPDATE_TYPES } from '../utils.js';
 
 const TYPE = {
@@ -32,10 +32,10 @@ export default class EventPresenter {
     const previousEvent = this.#component;
     const previousEventEdit = this.#editComponent;
     this.#component = new RoutePointView(this.#event, this.#offers, this.#destinations);
-    this.#component.setRollUpHandler(this.#handleEditClick);
+    this.#component.setRollUpHandler(this.#editClickHandler);
     this.#component.setFavoriteHandler(this.#handleFavoriteClick);
     this.#editComponent = new EditingFormView(this.#event, this.#offers, this.#destinations);
-    this.#editComponent.setRollDownHandler(this.#handleEventClick);
+    this.#editComponent.setRollDownHandler(this.#eventClickHandler);
     this.#editComponent.setSaveHandler(this.#saveHandler);
     this.#editComponent.setDeleteHandler(this.#deleteHandler);
 
@@ -57,19 +57,19 @@ export default class EventPresenter {
     remove(previousEventEdit);
   };
 
-  setSaving = () => {
-    if (this.#type === TYPE.EDITING) {
+  setSave = () => {
+    if (this.#type === TYPE.EDIT) {
       this.#editComponent.updateElement({ isDisabled: true, isSaving: true, });
     }
   };
 
-  setDeleting = () => {
-    if (this.#type === TYPE.EDITING) {
+  setDelete = () => {
+    if (this.#type === TYPE.EDIT) {
       this.#editComponent.updateElement({ isDisabled: true, isDeleting: true, });
     }
   };
 
-  setAborting = () => {
+  setAborte = () => {
     if (this.#type === TYPE.DEFAULT) {
       this.#editComponent.shake();
       return;
@@ -100,18 +100,18 @@ export default class EventPresenter {
 
   #eventToEdit = () => {
     replace(this.#editComponent, this.#component);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    document.addEventListener('keydown', this.#escKeyHandler);
     this.#switchType();
-    this.#type = TYPE.EDITING;
+    this.#type = TYPE.EDIT;
   };
 
   #editToEvent = () => {
     replace(this.#component, this.#editComponent);
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener('keydown', this.#escKeyHandler);
     this.#type = TYPE.DEFAULT;
   };
 
-  #escKeyDownHandler = (event) => {
+  #escKeyHandler = (event) => {
     if (event.key === 'Escape' || event.key === 'Esc') {
       event.preventDefault();
       this.#editComponent.reset(this.#event, this.#offers, this.#destinations);
@@ -125,8 +125,8 @@ export default class EventPresenter {
     { ...this.#event, isFavorite: !this.#event.isFavorite }
   );
 
-  #handleEditClick = () => this.#eventToEdit();
-  #handleEventClick = () => {
+  #editClickHandler = () => this.#eventToEdit();
+  #eventClickHandler = () => {
     if (this.#type !== TYPE.DEFAULT) {
       this.#editComponent.reset(this.#event, this.#offers, this.#destinations);
       this.#editToEvent();
@@ -143,6 +143,6 @@ export default class EventPresenter {
       UPDATE_TYPES.MINOR,
       event,
     );
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener('keydown', this.#escKeyHandler);
   };
 }

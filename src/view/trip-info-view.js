@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 
 const tripDestinationNames = (events) => {
   const destinationNames = events.map((event) => event.destinationName);
-  switch (tripDestinationNames.length) {
+  switch (destinationNames.length) {
     case 1:
       return `${destinationNames[0]}`;
     case 2:
@@ -37,7 +37,7 @@ const createTripInfoTemplate = (events, offers, destinations) => {
     offerPrices: addOffersPrices(event.type, event.offers, offers),
     destinationName: addDestinationName(event.destination, destinations)
   }));
-
+  
   return `<section class="trip-main__trip-info  trip-info">
             <div class="trip-info__main">
               <h1 class="trip-info__title">${tripDestinationNames(tripEvents)}</h1>

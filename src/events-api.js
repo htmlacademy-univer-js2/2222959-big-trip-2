@@ -1,6 +1,5 @@
 import ApiService from './framework/api-service.js';
 
-
 const METHOD = {
   GET: 'GET',
   PUT: 'PUT',
@@ -32,10 +31,7 @@ export default class EventsApiService extends ApiService {
       body: JSON.stringify(this.#adaptToServer(event)),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     });
-
-    const parsed = await ApiService.parseResponse(response);
-
-    return parsed;
+    return ApiService.parseResponse(response);
   };
 
   addEvent = async (event) => {
@@ -45,7 +41,7 @@ export default class EventsApiService extends ApiService {
       body: JSON.stringify(this.#adaptToServer(event)),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     });
-    return await ApiService.parseResponse(response);
+    return ApiService.parseResponse(response);
   };
 
   deleteEvent = async (event) => {
@@ -57,7 +53,6 @@ export default class EventsApiService extends ApiService {
   };
 
   #adaptToServer = (event) => {
-
     const adapted = {
       ...event,
       'base_price': event.basePrice,
