@@ -3,6 +3,8 @@ import ApiService from './framework/api-service.js';
 const METHOD = {
   GET: 'GET',
   PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE'
 };
 
 export default class EventsApiService extends ApiService {
@@ -22,7 +24,7 @@ export default class EventsApiService extends ApiService {
       .then(ApiService.parseResponse);
   }
 
-  updatePoint = async (event) => {
+  updateEvent = async (event) => {
     const response = await this._load({
       url: `points/${event.id}`,
       method: METHOD.PUT,
@@ -35,19 +37,37 @@ export default class EventsApiService extends ApiService {
     return parsed;
   };
 
+  addEvent = async (event) => {
+    const response = await this._load({
+      url: 'points',
+      method: METHOD.POST,
+      body: JSON.stringify(this.#adaptToServer(event)),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    });
+    return await ApiService.parseResponse(response);
+  };
+
+  deleteEvent = async (event) => {
+    const response = await this._load({
+      url: `points/${event.id}`,
+      method: METHOD.DELETE,
+    });
+    return response;
+  };
+
   #adaptToServer = (event) => {
 
     const adapted = {
       ...event,
       'base_price': event.basePrice,
-      'date_from': new Date(event.startDate).toISOString(),
-      'date_to': new Date(event.endDate).toISOString(),
+      'date_from': new Date(event.dateFrom).toISOString(),
+      'date_to': new Date(event.dateTo).toISOString(),
       'is_favorite': event.isFavorite,
     };
 
     delete adapted.basePrice;
-    delete adapted.startDate;
-    delete adapted.endDate;
+    delete adapted.dateFrom;
+    delete adapted.dateTo;
     delete adapted.isFavorite;
 
     return adapted;

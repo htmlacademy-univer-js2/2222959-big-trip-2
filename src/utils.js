@@ -55,7 +55,10 @@ const sortByDate = (a, b) => dayjs(a.startDate) - dayjs(b.startDate);
 
 const isSubmitDisabledByPrice = (price) => Number(price) > 0 && Number.isInteger(Number(price));
 
-const isDatesEqual = (dateA, dateB) => dayjs(dateA).isSame(dateB, 'D');
+const isSubmitDisabledByDestinationName = (name, destinations) => {
+  const destinationsName = Array.from(destinations, (dest) => dest.name);
+  return destinationsName.includes(name);
+};
 
 const SORT_TYPES = {
   DEFAULT: 'day',
@@ -91,6 +94,20 @@ const FILTER_TYPES = {
   PAST: 'past'
 };
 
+const TIME_LIMIT = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
+
+const addOffersPrices = (eventType, events, offers) => {
+  const allOffers = offers.find((item) => item.type === eventType).offers;
+  const selected = events.map((offer) => allOffers.find((item) => item.id === offer).price);
+  return selected.reduce((sum, price) => sum + price, 0);
+};
+
+const addDestinationName = (destination, destinations) =>
+  destinations.find((item) => item.id === destination).name;
+
 export {
   getRandomInteger,
   getRandomElement,
@@ -106,11 +123,14 @@ export {
   checkFavoriteOption,
   isSubmitDisabledByDate,
   isSubmitDisabledByPrice,
-  isDatesEqual,
   sortByDate,
   SORT_TYPES,
   FILTER_TYPES,
   USER_ACTIONS,
   UPDATE_TYPES,
-  NEW_POINT
+  NEW_POINT,
+  TIME_LIMIT,
+  isSubmitDisabledByDestinationName,
+  addOffersPrices,
+  addDestinationName
 };
