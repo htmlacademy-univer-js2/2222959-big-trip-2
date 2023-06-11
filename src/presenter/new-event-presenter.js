@@ -1,6 +1,6 @@
 
 import { remove, render, RenderPosition } from '../framework/render.js';
-import EditingFormView from '../view/form-edit.js';
+import EditingFormView from '../view/edit-form.js';
 import { USER_ACTIONS, UPDATE_TYPES } from '../utils.js';
 
 export default class NewEventPresenter {
@@ -30,7 +30,7 @@ export default class NewEventPresenter {
     this.#editComponent.setDeleteHandler(this.#deleteHandler);
     this.#editComponent.setRollDownHandler(this.#clickHandler);
     render(this.#editComponent, this.#eventsListContainer, RenderPosition.AFTERBEGIN);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    document.addEventListener('keydown', this.#escKeyHandler);
   };
 
   destroy = () => {
@@ -42,12 +42,12 @@ export default class NewEventPresenter {
     remove(this.#editComponent);
     this.#editComponent = null;
 
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener('keydown', this.#escKeyHandler);
   };
 
-  setSaving = () => this.#editComponent.updateElement({ isDisabled: true, isSaving: true });
+  setSave = () => this.#editComponent.updateElement({ isDisabled: true, isSaving: true });
 
-  setAborting = () => {
+  setAborte = () => {
     const resetFormState = () => {
       this.#editComponent.updateElement({ isDisabled: false, isSaving: false, isDeleting: false });
     };
@@ -59,15 +59,15 @@ export default class NewEventPresenter {
 
   #deleteHandler = () => {
     this.destroy();
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener('keydown', this.#escKeyHandler);
   };
 
   #clickHandler = () => {
     this.destroy();
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener('keydown', this.#escKeyHandler);
   };
 
-  #escKeyDownHandler = (e) => {
+  #escKeyHandler = (e) => {
     if (e.key === 'Escape' || e.key === 'Esc') {
       e.preventDefault();
       this.destroy();

@@ -1,20 +1,24 @@
 import TripEventsView from '../view/trip-events.js';
 import SortView from '../view/sort.js';
-import EmptyEventsView from '../view/empty-events-view.js';
+import NoEventsView from '../view/no-events-view.js';
 import LoadScreenView from '../view/load-screen-view.js';
 import EventPresenter from './event-presenter.js';
 import { render, remove, RenderPosition } from '../framework/render.js';
 import { SORT_TYPES, UPDATE_TYPES, USER_ACTIONS, FILTER_TYPES, sortByPrice, sortByDuration, sortByDate, filter, TIME_LIMIT } from '../utils.js';
 import NewEventPresenter from './new-event-presenter';
 import UiBlocker from '../framework/ui-blocker/ui-blocker';
+import ErrorScreenView from '../view/error-screen-view.js';
+import { newEventButtonComponent } from '../main.js';
 
 export default class TripEventsPresenter {
   #rootContainer;
   #eventsModel;
   #filterModel;
   #sortComponent = null;
-  #loadingComponent = new LoadScreenView();
+  #loadComponent = new LoadScreenView();
+  #errorComponent = new ErrorScreenView();
   #isLoading = true;
+  #isError = false;
   #eventsList = new TripEventsView();
   #emptyList = null;
   #eventPresenter = new Map();
@@ -88,11 +92,11 @@ export default class TripEventsPresenter {
         }
         break;
       case USER_ACTIONS.ADD:
-        this.#newEventPresenter.setSaving();
+        this.#newEventPresenter.setSave();
         try {
           this.#eventsModel.addEvent(updateType, update);
         } catch (err) {
-          this.#newEventPresenter.setAborting();
+          this.#newEventPresenter.setAborte();
         }
         break;
       case USER_ACTIONS.DELETE:
@@ -124,19 +128,25 @@ export default class TripEventsPresenter {
         break;
       case UPDATE_TYPES.INIT:
         this.#isLoading = false;
-        remove(this.#loadingComponent);
+        remove(this.#loadComponent);
+        this.#render();
+        break;
+      case UPDATE_TYPES.ERROR:
+        this.#isLoading = false;
+        this.#isError = true;
+        remove(this.#loadComponent);
         this.#render();
         break;
       default:
-        throw new Error(`Update Type ${updateType} is undefined.`);
+        throw new Error(`Update of ${updateType} is undefined. Try again`);
     }
   };
 
-  #sortHandler = (sortType) => {
-    if (this.#currentSortType === sortType) {
+  #sortHandler = (type) => {
+    if (this.#currentSortType === type) {
       return;
     }
-    this.#currentSortType = sortType;
+    this.#currentSortType = type;
     this.#clear();
     this.#render();
   };
@@ -156,15 +166,21 @@ export default class TripEventsPresenter {
   };
 
   #renderEmptyList = () => {
-    this.#emptyList = new EmptyEventsView(this.#filterType);
+    this.#emptyList = new NoEventsView(this.#filterType);
     render(this.#emptyList, this.#rootContainer);
-  }
+  };
 
   #render = () => {
     const events = this.events;
     render(this.#eventsList, this.#rootContainer);
     if (this.#isLoading) {
-      this.#renderLoading();
+      this.#renderLoad();
+      return;
+    }
+
+    if (this.#isError) {
+      this.#renderError();
+      newEventButtonComponent.element.disabled = true;
       return;
     }
 
@@ -176,8 +192,12 @@ export default class TripEventsPresenter {
     this.#renderEvents(events);
   };
 
-  #renderLoading = () => {
-    render(this.#loadingComponent, this.#rootContainer);
+  #renderLoad = () => {
+    render(this.#loadComponent, this.#rootContainer);
+  };
+
+  #renderError = () => {
+    render(this.#errorComponent, this.#rootContainer);
   };
 
   #clear = ({ resetSortType = false } = {}) => {
@@ -187,7 +207,7 @@ export default class TripEventsPresenter {
 
     remove(this.#sortComponent);
     remove(this.#emptyList);
-    remove(this.#loadingComponent);
+    remove(this.#loadComponent);
 
     if (this.#emptyList) {
       remove(this.#emptyList);

@@ -6,9 +6,9 @@ import he from 'he';
 import 'flatpickr/dist/flatpickr.min.css';
 
 
-const createDestionationsOptionsTemplate = (destins) =>
-  destins.reduce((result, destin) =>
-    result.concat(`<option value="${destin}"></option>\n`), '');
+const createDestionationsOptionsTemplate = (destinations) =>
+  destinations.reduce((result, destination) =>
+    result.concat(`<option value="${destination.name}"></option>\n`), '');
 
 const renderDestinationPictures = (pictures) => pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('');
 
@@ -25,7 +25,7 @@ const renderOffers = (eventOffers, offers) =>
     </div>`
   ), '');
 
-const findOffersForType = (eventType, allOffers) =>
+const findOffersByType = (eventType, allOffers) =>
   allOffers.find(({ type }) => type === eventType).offers;
 
 const createListTemplate = (offers) =>
@@ -38,9 +38,9 @@ const createListTemplate = (offers) =>
       </label>
     </div>`).join('\n');
 
-const createEditingFormTemplate = ({ id, selectedDestination, type, basePrice, dateFrom, dateTo, offers, isDisabled, isSaving, isDeleting }, allOffers, allDestinations) => {
-  const allOffersForType = findOffersForType(type, allOffers);
-  const deleting = isDeleting ? 'Deleting...' : 'Delete';
+const createEditFormTemplate = ({ id, selectedDestination, type, basePrice, dateFrom, dateTo, offers, isDisabled, isSaving, isDeleting }, allOffers, allDestinations) => {
+  const allOffersByType = findOffersByType(type, allOffers);
+  const deleteState = isDeleting ? 'Deleting...' : 'Delete';
   return `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">
@@ -86,19 +86,19 @@ const createEditingFormTemplate = ({ id, selectedDestination, type, basePrice, d
             ${isSubmitDisabledByDestinationName(selectedDestination.name, allDestinations) ? '' : 'disabled'}>
               ${isSaving ? 'Saving...' : 'Save'}
           </button>
-          <button class="event__reset-btn" type="reset">${id ? deleting : 'Cancel'}</button>
+          <button class="event__reset-btn" type="reset">${id ? deleteState : 'Cancel'}</button>
           <button class="event__rollup-btn" type="button">
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
         <section class="event__details">
-          <section class="event__section  event__section--offers ${!allOffersForType.length ? 'visually-hidden' : ''}">
+          <section class="event__section  event__section--offers ${!allOffersByType.length ? 'visually-hidden' : ''}">
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
             <div class="event__available-offers">
-              ${renderOffers(offers, allOffersForType)}
+              ${renderOffers(offers, allOffersByType)}
             </div>
           </section>
-          <section class="event__section  event__section--destination ${selectedDestination.description !== '' ? 'visually-hidden' : ''}">
+          <section class="event__section  event__section--destination ${'description' in selectedDestination ? '' : 'visually-hidden'}">
             <h3 class="event__section-title  event__section-title--destination">Destination</h3>
             <p class="event__destination-description">${selectedDestination.description}</p>
             <div class="event__photos-container">
@@ -125,12 +125,40 @@ export default class EditingFormView extends AbstractStatefulView {
     this.#allDestinations = allDestinations;
     this.#setInnerHandlers();
     this.#setStartDatepicker();
-    this.#setStopDatepicker();
+    this.#setEndDatepicker();
   }
 
   get template () {
-    return createEditingFormTemplate(this._state, this.#allOffers, this.#allDestinations);
+    return createEditFormTemplate(this._state, this.#allOffers, this.#allDestinations);
   }
+
+  setDeleteHandler = (callback) => {
+    this._callback.delete = callback;
+    this.element.querySelector('form').addEventListener('reset', this.#deleteHandler);
+  };
+
+  setRollDownHandler = (callback) => {
+    this._callback.rollDown = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollDownHandler);
+  };
+
+  setSaveHandler = (callback) => {
+    this._callback.save = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#saveHandler);
+  };
+
+  removeElement = () => {
+    super.removeElement();
+    if (this.#startDatepicker) {
+      this.#startDatepicker.destroy();
+      this.#startDatepicker = null;
+    }
+
+    if (this.#stopDatepicker) {
+      this.#stopDatepicker.destroy();
+      this.#stopDatepicker = null;
+    }
+  };
 
   reset = (event, allOffers, allDestinations) =>  this.updateElement(EditingFormView.parseEvent(event, allOffers, allDestinations));
 
@@ -139,7 +167,7 @@ export default class EditingFormView extends AbstractStatefulView {
     this.setSaveHandler(this._callback.save);
     this.setRollDownHandler(this._callback.rollDown);
     this.#setStartDatepicker();
-    this.#setStopDatepicker();
+    this.#setEndDatepicker();
     this.setDeleteHandler(this._callback.delete);
   };
 
@@ -155,23 +183,14 @@ export default class EditingFormView extends AbstractStatefulView {
     );
   };
 
-  setDeleteHandler = (callback) => {
-    this._callback.delete = callback;
-    this.element.querySelector('form').addEventListener('reset', this.#deleteHandler);
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationToggleHandler);
+    this.element.querySelector('.event__type-group').addEventListener('click', this.#typeToggleHandler);
+    this.element.querySelector('.event__available-offers').addEventListener('change', this.#offerToggleHandler);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceToggleHandler);
   };
 
-  #deleteHandler = (event) => {
-    event.preventDefault();
-    this._callback.delete(EditingFormView.parseState(this._state, this.#allDestinations));
-  };
-
-  #startDateChangeHandler = ([userStartDate]) => {
-    this.updateElement({
-      startDate: dayjs(userStartDate),
-    });
-  };
-
-  #setStopDatepicker = () => {
+  #setEndDatepicker = () => {
     const startDate = dayjs(this._state.dateFrom).subtract(1, 'days');
     this.#stopDatepicker = flatpickr(
       this.element.querySelector('[name = "event-end-time"]'),
@@ -189,22 +208,21 @@ export default class EditingFormView extends AbstractStatefulView {
     );
   };
 
-  #endDateChangeHandler = ([userEndDate]) => {
+  #deleteHandler = (event) => {
+    event.preventDefault();
+    this._callback.delete(EditingFormView.parseState(this._state, this.#allDestinations));
+  };
+
+  #startDateChangeHandler = ([userStartDate]) => {
     this.updateElement({
-      endDate: dayjs(userEndDate),
+      dateFrom: dayjs(userStartDate),
     });
   };
 
-  setRollDownHandler = (callback) => {
-    this._callback.rollDown = callback;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollDownHandler);
-  };
-
-  #setInnerHandlers = () => {
-    this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationToggleHandler);
-    this.element.querySelector('.event__type-group').addEventListener('click', this.#typeToggleHandler);
-    this.element.querySelector('.event__available-offers').addEventListener('change', this.#offerToggleHandler);
-    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceToggleHandler);
+  #endDateChangeHandler = ([endDate]) => {
+    this.updateElement({
+      dateTo: dayjs(endDate),
+    });
   };
 
   #priceToggleHandler = (e) => {
@@ -217,7 +235,7 @@ export default class EditingFormView extends AbstractStatefulView {
   #destinationToggleHandler = (e) => {
     e.preventDefault();
     this.updateElement({
-      selectedDestination: e.target.value,
+      selectedDestination: { 'name': e.target.value },
     });
   };
 
@@ -225,24 +243,24 @@ export default class EditingFormView extends AbstractStatefulView {
     if (!e.target.matches('input[name=event-type]')) {
       return;
     }
-    const typeValue = e.target.value;
+    const type = e.target.value;
     e.preventDefault();
     this.updateElement({
-      type: typeValue,
+      type: type,
       offers: [],
-      availableOffers: this.#allOffers.find((item) => (item.type === typeValue)).offers
+      availableOffers: this.#allOffers.find((item) => (item.type === type)).offers
     });
   };
 
   #offerToggleHandler = (e) => {
     e.preventDefault();
     const selectedOffers = [...this._state.offers];
-    const clickedOfferId = parseInt(e.target.id.match(/\d+/), 10);
+    const focusedOfferId = parseInt(e.target.id.match(/\d+/), 10);
 
     if (e.target.checked) {
-      selectedOffers.push(clickedOfferId);
+      selectedOffers.push(focusedOfferId);
     } else {
-      selectedOffers.splice(selectedOffers.indexOf(clickedOfferId), 1);
+      selectedOffers.splice(selectedOffers.indexOf(focusedOfferId), 1);
     }
     this.updateElement({ offers: selectedOffers });
   };
@@ -252,27 +270,9 @@ export default class EditingFormView extends AbstractStatefulView {
     this._callback.rollDown();
   };
 
-  setSaveHandler = (callback) => {
-    this._callback.save = callback;
-    this.element.querySelector('form').addEventListener('submit', this.#saveHandler);
-  };
-
   #saveHandler = (e) => {
     e.preventDefault();
     this._callback.save(EditingFormView.parseState(this._state, this.#allDestinations));
-  };
-
-  removeElement = () => {
-    super.removeElement();
-    if (this.#startDatepicker) {
-      this.#startDatepicker.destroy();
-      this.#startDatepicker = null;
-    }
-
-    if (this.#stopDatepicker) {
-      this.#stopDatepicker.destroy();
-      this.#stopDatepicker = null;
-    }
   };
 
   static parseEvent = (event, allOffers, allDestinations) => ({

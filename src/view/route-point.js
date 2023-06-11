@@ -1,5 +1,5 @@
-import AbstractView from '../framework/view/abstract-view';
-import { humanizePointDueDate, duration, getDate, getTime, checkFavoriteOption } from '../utils';
+import AbstractView from '../framework/view/abstract-view.js';
+import { humanizePointDueDate, durationDates, getDate, getTime, checkFavoriteOption } from '../utils.js';
 
 const renderOffers = (eventType, eventOffers, allOffers) => {
   const offers = allOffers.find((item) => item.type === eventType).offers;
@@ -18,7 +18,7 @@ const renderOffers = (eventType, eventOffers, allOffers) => {
 const createRoutePointTemplate = ({basePrice, type, destination, isFavorite, dateFrom, dateTo, offers}, allOffers, allDestinations) => {
   const startDate = dateFrom ? humanizePointDueDate(dateFrom) : '';
   const endDate = dateTo ? humanizePointDueDate(dateTo) : '';
-  const eventDuration = duration(dateFrom, dateTo);
+  const duration = durationDates(dateFrom, dateTo);
   const name = allDestinations.find((item) => (item.id === destination)).name;
   return (
     `<li class="trip-events__item">
@@ -34,7 +34,7 @@ const createRoutePointTemplate = ({basePrice, type, destination, isFavorite, dat
         &mdash;
         <time class="event__end-time" datetime="${dateTo}">${(startDate === endDate) ? getTime(dateTo) : endDate}</time>
       </p>
-      <p class="event__duration">${eventDuration}</p>
+      <p class="event__duration">${duration}</p>
     </div>
     <p class="event__price">
       &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
@@ -74,12 +74,12 @@ export default class RoutePointView extends AbstractView {
   setRollUpHandler = (callback) => {
     this._callback.rollUp = callback;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#rollUpHandler);
-  }
+  };
 
   #rollUpHandler = (e) => {
     e.preventDefault();
     this._callback.rollUp();
-  }
+  };
 
   setFavoriteHandler = (callback) => {
     this._callback.favorite = callback;
@@ -92,5 +92,5 @@ export default class RoutePointView extends AbstractView {
   #favoriteClickHandler = (event) => {
     event.preventDefault();
     this._callback.favorite();
-  }
+  };
 }

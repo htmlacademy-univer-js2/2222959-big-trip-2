@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 
 const tripDestinationNames = (events) => {
   const destinationNames = events.map((event) => event.destinationName);
-  switch (tripDestinationNames.length) {
+  switch (destinationNames.length) {
     case 1:
       return `${destinationNames[0]}`;
     case 2:

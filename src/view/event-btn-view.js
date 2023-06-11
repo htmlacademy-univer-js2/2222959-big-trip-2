@@ -1,14 +1,14 @@
 import AbstractView from '../framework/view/abstract-view';
 
 
-const createNewEventButton = () => (
+const createEventButton = () => (
   '<button class="trip-main__event-add-btn  btn  btn--big  btn--yellow" type="button">New event</button>'
 );
 
 export default class NewEventButton extends AbstractView {
 
   get template() {
-    return createNewEventButton();
+    return createEventButton();
   }
 
   setClickHandler = (callback) => {
