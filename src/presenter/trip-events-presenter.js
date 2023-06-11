@@ -168,7 +168,7 @@ export default class TripEventsPresenter {
   #renderEmptyList = () => {
     this.#emptyList = new NoEventsView(this.#filterType);
     render(this.#emptyList, this.#rootContainer);
-  }
+  };
 
   #render = () => {
     const events = this.events;

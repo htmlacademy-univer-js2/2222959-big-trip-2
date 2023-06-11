@@ -37,7 +37,7 @@ const createTripInfoTemplate = (events, offers, destinations) => {
     offerPrices: addOffersPrices(event.type, event.offers, offers),
     destinationName: addDestinationName(event.destination, destinations)
   }));
-  
+
   return `<section class="trip-main__trip-info  trip-info">
             <div class="trip-info__main">
               <h1 class="trip-info__title">${tripDestinationNames(tripEvents)}</h1>
