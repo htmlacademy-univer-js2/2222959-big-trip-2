@@ -84,11 +84,11 @@ export default class TripEventsPresenter {
     this.#uiBlocker.block();
     switch (actionType) {
       case USER_ACTIONS.UPDATE:
-        this.#eventPresenter.get(update.id).setSaving();
+        this.#eventPresenter.get(update.id).setSave();
         try {
           this.#eventsModel.updateEvent(updateType, update);
         } catch (err) {
-          this.#eventPresenter.get(update.id).setAborting();
+          this.#eventPresenter.get(update.id).setAborte();
         }
         break;
       case USER_ACTIONS.ADD:
@@ -100,11 +100,11 @@ export default class TripEventsPresenter {
         }
         break;
       case USER_ACTIONS.DELETE:
-        this.#eventPresenter.get(update.id).setDeleting();
+        this.#eventPresenter.get(update.id).setDelete();
         try {
           this.#eventsModel.deleteEvent(updateType, update);
         } catch (err) {
-          this.#eventPresenter.get(update.id).setAborting();
+          this.#eventPresenter.get(update.id).setAborte();
         }
         break;
       default:
